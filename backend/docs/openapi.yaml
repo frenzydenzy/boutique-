@@ -1,0 +1,237 @@
+openapi: 3.0.0
+info:
+  title: Boutique Platform API
+  description: Production-ready API documentation for Boutique Exhibition Platform
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api
+    description: Local server
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Products
+  - name: Reviews
+  - name: Wishlist
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+paths:
+
+  # ================= AUTH =================
+
+  /users/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string }
+                password: { type: string }
+                gender: { type: string }
+      responses:
+        201:
+          description: User registered successfully
+
+  /users/login:
+    post:
+      tags: [Auth]
+      summary: Login user and get JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        200:
+          description: Login successful
+
+  # ================= USERS =================
+
+  /users/profile:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User profile
+
+  /users/{id}/role:
+    put:
+      tags: [Users]
+      summary: Update user role (Admin only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  example: designer
+      responses:
+        200:
+          description: Role updated
+
+  # ================= PRODUCTS =================
+
+  /products:
+    get:
+      tags: [Products]
+      summary: Get all products with search, filter, sort
+      parameters:
+        - in: query
+          name: keyword
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: minPrice
+          schema: { type: number }
+        - in: query
+          name: maxPrice
+          schema: { type: number }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [price_asc, price_desc, rating_desc, reviews_desc]
+      responses:
+        200:
+          description: Product list
+
+    post:
+      tags: [Products]
+      summary: Create product (Admin/Designer)
+      security:
+        - BearerAuth: []
+      responses:
+        201:
+          description: Product created
+
+  /products/{id}:
+    get:
+      tags: [Products]
+      summary: Get single product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Product details
+
+    put:
+      tags: [Products]
+      summary: Update product
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Product updated
+
+    delete:
+      tags: [Products]
+      summary: Delete product
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Product deleted
+
+  # ================= REVIEWS =================
+
+  /reviews:
+    post:
+      tags: [Reviews]
+      summary: Submit a review
+      security:
+        - BearerAuth: []
+      responses:
+        201:
+          description: Review submitted
+
+  /reviews/pending:
+    get:
+      tags: [Reviews]
+      summary: Get pending reviews (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Pending reviews
+
+  /reviews/{id}/approve:
+    put:
+      tags: [Reviews]
+      summary: Approve review (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Review approved
+
+  # ================= WISHLIST =================
+
+  /users/wishlist/{productId}:
+    post:
+      tags: [Wishlist]
+      summary: Add product to wishlist
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Added to wishlist
+
+    delete:
+      tags: [Wishlist]
+      summary: Remove product from wishlist
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Removed from wishlist
