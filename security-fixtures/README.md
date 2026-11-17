@@ -9,6 +9,7 @@ Expected findings in remediation-probe.js:
 - evaluateExpression: untrusted input reaches eval (CWE-95).
 - inspectFile: untrusted input is concatenated into a shell command (CWE-78).
 - findUser: untrusted input is concatenated into SQL (CWE-89).
+- hashPassword: MD5 is used for password hashing (CWE-328).
 
 No application routes, dependencies, configuration, or real credentials are
 changed. Importing the fixture only defines functions; none are invoked.

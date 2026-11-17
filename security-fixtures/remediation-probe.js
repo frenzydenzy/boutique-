@@ -12,4 +12,8 @@ function findUser(database, userName) {
   return database.query("SELECT * FROM users WHERE name = '" + userName + "'");
 }
 
-module.exports = { evaluateExpression, inspectFile, findUser };
+function hashPassword(password) {
+  return require('node:crypto').createHash('md5').update(password).digest('hex');
+}
+
+module.exports = { evaluateExpression, inspectFile, findUser, hashPassword };
